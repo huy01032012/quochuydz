@@ -6,12 +6,13 @@ local TweenService = game:GetService("TweenService")
 
 _G.SilentAim = false 
 
--- ===== GIAO DIỆN BẬT TẮT THƯƠNG HIỆU QUOCHUY DZ =====
+-- ===== KHỞI TẠO SCREEN GUI =====
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "QuocHuyAimbotMenu"
+ScreenGui.Name = "QuocHuyAimbotMenu_V2"
 ScreenGui.Parent = CoreGui
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
+-- ===== GIAO DIỆN BẢNG CHÍNH (MAIN FRAME) =====
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Size = UDim2.new(0, 180, 0, 90)
@@ -29,7 +30,7 @@ UICorner.Parent = MainFrame
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 0, 35)
 Title.BackgroundTransparency = 1
-Title.Text = "QuocHuy dz - AIM" -- Đã đổi tên thành thương hiệu của bạn ở đây
+Title.Text = "QuocHuy dz - AIM"
 Title.TextColor3 = Color3.fromRGB(255, 215, 0) 
 Title.TextSize = 14
 Title.Font = Enum.Font.GothamBold
@@ -49,6 +50,7 @@ local BtnCorner = Instance.new("UICorner")
 BtnCorner.CornerRadius = UDim.new(0, 6)
 BtnCorner.Parent = ToggleBtn
 
+-- Xử lý nút Bật/Tắt Hack Aim
 ToggleBtn.MouseButton1Click:Connect(function()
     _G.SilentAim = not _G.SilentAim
     if _G.SilentAim then
@@ -60,7 +62,35 @@ ToggleBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- ===== CƠ CHẾ KHÓA MỤC TIÊU (PVP & PVE) =====
+-- ===== NÚT TRÒN NHỎ ẨN/HIỆN MENU (OPEN/CLOSE BUTTON) =====
+local CloseOpenBtn = Instance.new("TextButton")
+CloseOpenBtn.Name = "CloseOpenBtn"
+CloseOpenBtn.Size = UDim2.new(0, 45, 0, 45)
+CloseOpenBtn.Position = UDim2.new(0.02, 0, 0.2, 0) -- Nằm góc trên bên trái màn hình riêng biệt
+CloseOpenBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+CloseOpenBtn.Text = "QH"
+CloseOpenBtn.TextColor3 = Color3.fromRGB(255, 215, 0)
+CloseOpenBtn.TextSize = 14
+CloseOpenBtn.Font = Enum.Font.GothamBold
+CloseOpenBtn.Active = true
+CloseOpenBtn.Draggable = true -- Có thể kéo nút tròn này đi chỗ khác nếu vướng
+CloseOpenBtn.Parent = ScreenGui
+
+local RoundCorner = Instance.new("UICorner")
+RoundCorner.CornerRadius = UDim.new(1, 0) -- Tạo hình tròn hoàn hảo
+RoundCorner.Parent = CloseOpenBtn
+
+local UIStroke = Instance.new("UIStroke")
+UIStroke.Color = Color3.fromRGB(255, 215, 0) -- Viền màu vàng Gold
+UIStroke.Thickness = 1.5
+UIStroke.Parent = CloseOpenBtn
+
+-- Xử lý ẩn hiện khi bấm nút tròn "QH"
+CloseOpenBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
+end)
+
+-- ===== CƠ CHẾ SILENT AIM =====
 local function GetClosestTarget()
     local MaxDistance = math.huge
     local Target = nil
