@@ -1,0 +1,107 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
+local CoreGui = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
+
+_G.SilentAim = false 
+
+-- ===== GIAO DIỆN BẬT TẮT THƯƠNG HIỆU QUOCHUY DZ =====
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "QuocHuyAimbotMenu"
+ScreenGui.Parent = CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 180, 0, 90)
+MainFrame.Position = UDim2.new(0.05, 0, 0.4, 0) 
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true 
+MainFrame.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 8)
+UICorner.Parent = MainFrame
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 35)
+Title.BackgroundTransparency = 1
+Title.Text = "QuocHuy dz - AIM" -- Đã đổi tên thành thương hiệu của bạn ở đây
+Title.TextColor3 = Color3.fromRGB(255, 215, 0) 
+Title.TextSize = 14
+Title.Font = Enum.Font.GothamBold
+Title.Parent = MainFrame
+
+local ToggleBtn = Instance.new("TextButton")
+ToggleBtn.Size = UDim2.new(0, 140, 0, 35)
+ToggleBtn.Position = UDim2.new(0.5, -70, 0.5, 0)
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40) 
+ToggleBtn.Text = "Aimbot: OFF"
+ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleBtn.TextSize = 13
+ToggleBtn.Font = Enum.Font.GothamBold
+ToggleBtn.Parent = MainFrame
+
+local BtnCorner = Instance.new("UICorner")
+BtnCorner.CornerRadius = UDim.new(0, 6)
+BtnCorner.Parent = ToggleBtn
+
+ToggleBtn.MouseButton1Click:Connect(function()
+    _G.SilentAim = not _G.SilentAim
+    if _G.SilentAim then
+        ToggleBtn.Text = "Aimbot: ON"
+        TweenService:Create(ToggleBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(40, 180, 40)}):Play() 
+    else
+        ToggleBtn.Text = "Aimbot: OFF"
+        TweenService:Create(ToggleBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(180, 40, 40)}):Play() 
+    end
+end)
+
+-- ===== CƠ CHẾ KHÓA MỤC TIÊU (PVP & PVE) =====
+local function GetClosestTarget()
+    local MaxDistance = math.huge
+    local Target = nil
+    
+    for _, v in pairs(Players:GetPlayers()) do
+        if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChildOfClass("Humanoid") and v.Character:FindFirstChildOfClass("Humanoid").Health > 0 then
+            local Pos, OnScreen = workspace.CurrentCamera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
+            if OnScreen then
+                local Dist = (Vector2.new(Mouse.X, Mouse.Y) - Vector2.new(Pos.X, Pos.Y)).Magnitude
+                if Dist < MaxDistance then
+                    MaxDistance = Dist
+                    Target = v.Character.HumanoidRootPart
+                end
+            end
+        end
+    end
+    
+    for _, v in pairs(workspace:GetChildren()) do
+        if v:IsA("Model") and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChildOfClass("Humanoid") and v:FindFirstChildOfClass("Humanoid").Health > 0 then
+            if not Players:GetPlayerFromCharacter(v) then
+                local Pos, OnScreen = workspace.CurrentCamera:WorldToViewportPoint(v.HumanoidRootPart.Position)
+                if OnScreen then
+                    local Dist = (Vector2.new(Mouse.X, Mouse.Y) - Vector2.new(Pos.X, Pos.Y)).Magnitude
+                    if Dist < MaxDistance then
+                        MaxDistance = Dist
+                        Target = v.HumanoidRootPart
+                    end
+                end
+            end
+        end
+    end
+    return Target
+end
+
+local Hook; Hook = hookmetamethod(game, "__index", function(Self, Key)
+    if _G.SilentAim and Self == Mouse and (Key == "Hit" or Key == "Target") then
+        local Target = GetClosestTarget()
+        if Target then
+            if Key == "Hit" then return Target.CFrame
+            elseif Key == "Target" then return Target end
+        end
+    end
+    return Hook(Self, Key)
+end)
