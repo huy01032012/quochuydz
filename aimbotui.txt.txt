@@ -4,45 +4,98 @@ local Mouse = LocalPlayer:GetMouse()
 local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
 
-_G.SilentAim = false 
+_G.SilentAim = false
+
+-- CHỐNG TRÙNG LẶP: XÓA MENU CŨ NẾU CHẠY LẠI SCRIPT
+if CoreGui:FindFirstChild("QuocHuy_Premium_Hub") then
+    CoreGui["QuocHuy_Premium_Hub"]:Destroy()
+end
 
 -- ===== KHỞI TẠO SCREEN GUI =====
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "QuocHuyAimbotMenu_V3"
+ScreenGui.Name = "QuocHuy_Premium_Hub"
 ScreenGui.Parent = CoreGui
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
--- ===== GIAO DIỆN BẢNG CHÍNH (MAIN FRAME) =====
+-- ===== 1. NÚT TRÒN LOGO NGOÀI MÀN HÌNH (KHỦNG LONG INDOMINUS REX) =====
+local LogoLauncher = Instance.new("ImageButton")
+LogoLauncher.Name = "LogoLauncher"
+LogoLauncher.Size = UDim2.new(0, 60, 0, 60) -- Kích thước vừa vặn nổi bật
+LogoLauncher.Position = UDim2.new(0.05, 0, 0.2, 0)
+LogoLauncher.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+LogoLauncher.Active = true
+LogoLauncher.Draggable = true
+LogoLauncher.Parent = ScreenGui
+
+-- Cấu hình ảnh Khủng Long Indominus Rex chuẩn tỷ lệ không bị bóp méo
+LogoLauncher.Image = "rbxassetid://11419714821" 
+LogoLauncher.ScaleType = Enum.ScaleType.Crop
+
+-- Bo tròn bức ảnh thành một nút tròn hoàn hảo
+local LogoCorner = Instance.new("UICorner")
+LogoCorner.CornerRadius = UDim.new(1, 0)
+LogoCorner.Parent = LogoLauncher
+
+-- Hiệu ứng viền xanh Neon bảo mật dày dặn bao quanh logo khủng long
+local LogoStroke = Instance.new("UIStroke")
+LogoStroke.Color = Color3.fromRGB(52, 152, 219)
+LogoStroke.Thickness = 2.5
+LogoStroke.Parent = LogoLauncher
+
+-- ===== 2. GIAO DIỆN BẢNG MENU CHÍNH (MAIN FRAME) =====
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 180, 0, 90)
-MainFrame.Position = UDim2.new(0.05, 0, 0.4, 0) 
-MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+MainFrame.Size = UDim2.new(0, 260, 0, 240) -- Căn chỉnh kích thước cân đối
+MainFrame.Position = UDim2.new(0.35, 0, 0.3, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
-MainFrame.Draggable = true 
+MainFrame.Draggable = true
+MainFrame.Visible = false -- Mặc định ẩn, chạm vào Logo mới bung ra
 MainFrame.Parent = ScreenGui
 
-local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0, 8)
-UICorner.Parent = MainFrame
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 10)
+MainCorner.Parent = MainFrame
 
+local MainStroke = Instance.new("UIStroke")
+MainStroke.Color = Color3.fromRGB(52, 152, 219)
+MainStroke.Thickness = 1.5
+MainStroke.Parent = MainFrame
+
+-- Tiêu đề chữ vàng cao cấp của Menu
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, 0, 0, 35)
+Title.Size = UDim2.new(1, 0, 0, 40)
 Title.BackgroundTransparency = 1
-Title.Text = "QuocHuy dz - AIM"
-Title.TextColor3 = Color3.fromRGB(255, 215, 0) 
+Title.Text = "QUOC HUY PREMIUM HUB"
+Title.TextColor3 = Color3.fromRGB(255, 215, 0)
 Title.TextSize = 14
 Title.Font = Enum.Font.GothamBold
 Title.Parent = MainFrame
 
+-- Nút tròn nhỏ "QH" đặt góc trên bên phải để thu gọn nhanh bảng về Logo
+local QHCloseBtn = Instance.new("TextButton")
+QHCloseBtn.Size = UDim2.new(0, 30, 0, 30)
+QHCloseBtn.Position = UDim2.new(1, -35, 0, 5)
+QHCloseBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+QHCloseBtn.Text = "QH"
+QHCloseBtn.TextColor3 = Color3.fromRGB(255, 215, 0)
+QHCloseBtn.TextSize = 12
+QHCloseBtn.Font = Enum.Font.GothamBold
+QHCloseBtn.Parent = MainFrame
+
+local QHCorner = Instance.new("UICorner")
+QHCorner.CornerRadius = UDim.new(1, 0)
+QHCorner.Parent = QHCloseBtn
+
+-- ===== PHẦN TÍNH NĂNG 1: NÚT BẬT / TẮT AIMBOT =====
 local ToggleBtn = Instance.new("TextButton")
-ToggleBtn.Size = UDim2.new(0, 140, 0, 35)
-ToggleBtn.Position = UDim2.new(0.5, -70, 0.5, 0)
-ToggleBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40) 
+ToggleBtn.Size = UDim2.new(0, 220, 0, 38)
+ToggleBtn.Position = UDim2.new(0.5, -110, 0, 50)
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
 ToggleBtn.Text = "Aimbot: OFF"
 ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-ToggleBtn.TextSize = 13
+ToggleBtn.TextSize = 14
 ToggleBtn.Font = Enum.Font.GothamBold
 ToggleBtn.Parent = MainFrame
 
@@ -50,53 +103,107 @@ local BtnCorner = Instance.new("UICorner")
 BtnCorner.CornerRadius = UDim.new(0, 6)
 BtnCorner.Parent = ToggleBtn
 
--- Xử lý nút Bật/Tắt Hack Aim chính
+-- ===== PHẦN TÍNH NĂNG 2: KHU VỰC KHÔNG GIAN LOAD SCRIPT KHÁC =====
+local ScriptBox = Instance.new("TextBox")
+ScriptBox.Size = UDim2.new(0, 220, 0, 55)
+ScriptBox.Position = UDim2.new(0.5, -110, 0, 105)
+ScriptBox.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
+ScriptBox.Text = ""
+ScriptBox.PlaceholderText = "Dán đoạn code Lua vào đây..."
+ScriptBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+ScriptBox.TextSize = 12
+ScriptBox.Font = Enum.Font.Code
+ScriptBox.TextXAlignment = Enum.TextXAlignment.Left
+ScriptBox.TextYAlignment = Enum.TextYAlignment.Top
+ScriptBox.ClearTextOnFocus = false
+ScriptBox.Parent = MainFrame
+
+local BoxCorner = Instance.new("UICorner")
+BoxCorner.CornerRadius = UDim.new(0, 6)
+BoxCorner.Parent = ScriptBox
+
+-- Nút kích hoạt đoạn code vừa dán
+local ExecuteBtn = Instance.new("TextButton")
+ExecuteBtn.Size = UDim2.new(0, 220, 0, 35)
+ExecuteBtn.Position = UDim2.new(0.5, -110, 0, 175)
+ExecuteBtn.BackgroundColor3 = Color3.fromRGB(52, 152, 219)
+ExecuteBtn.Text = "EXECUTE SCRIPT"
+ExecuteBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ExecuteBtn.TextSize = 13
+ExecuteBtn.Font = Enum.Font.GothamBold
+ExecuteBtn.Parent = MainFrame
+
+local ExecCorner = Instance.new("UICorner")
+ExecCorner.CornerRadius = UDim.new(0, 6)
+ExecCorner.Parent = ExecuteBtn
+
+
+-- ==================== HỆ THỐNG XỬ LÝ LOGIC SỰ KIỆN GIAO DIỆN ====================
+
+-- Chạm vào Logo lơ lửng -> Ẩn logo, bung mở bảng điều khiển chính
+LogoLauncher.MouseButton1Click:Connect(function()
+    LogoLauncher.Visible = false
+    MainFrame.Visible = true
+end)
+
+-- Chạm vào nút tròn "QH" -> Thu gọn ẩn bảng chính, hiện lại nút Logo
+QHCloseBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+    LogoLauncher.Visible = true
+end)
+
+-- Sự kiện nhấn nút chuyển đổi Trạng thái Aimbot (ON / OFF) kèm đổi màu mượt mà
+local IsTweening = false
 ToggleBtn.MouseButton1Click:Connect(function()
+    if IsTweening then return end
+    IsTweening = true
+    
     _G.SilentAim = not _G.SilentAim
     if _G.SilentAim then
         ToggleBtn.Text = "Aimbot: ON"
-        TweenService:Create(ToggleBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(40, 180, 40)}):Play() 
+        local tween = TweenService:Create(ToggleBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(40, 180, 40)})
+        tween:Play()
+        tween.Completed:Connect(function() IsTweening = false end)
     else
         ToggleBtn.Text = "Aimbot: OFF"
-        TweenService:Create(ToggleBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(180, 40, 40)}):Play() 
+        local tween = TweenService:Create(ToggleBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(180, 40, 40)})
+        tween:Play()
+        tween.Completed:Connect(function() IsTweening = false end)
     end
 end)
 
--- ===== NÚT TRÒN NHỎ ẨN/HIỆN MENU (MỞ/ĐÓNG UI THẦN THÁNH) =====
-local CloseOpenBtn = Instance.new("TextButton")
-CloseOpenBtn.Name = "CloseOpenBtn"
-CloseOpenBtn.Size = UDim2.new(0, 45, 0, 45)
-CloseOpenBtn.Position = UDim2.new(0.02, 0, 0.2, 0) -- Nằm góc riêng biệt phía trên bên trái màn hình
-CloseOpenBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-CloseOpenBtn.Text = "QH"
-CloseOpenBtn.TextColor3 = Color3.fromRGB(255, 215, 0)
-CloseOpenBtn.TextSize = 14
-CloseOpenBtn.Font = Enum.Font.GothamBold
-CloseOpenBtn.Active = true
-CloseOpenBtn.Draggable = true -- Có thể giữ chuột trái để kéo nút tròn đi chỗ khác
-CloseOpenBtn.Parent = ScreenGui
-
-local RoundCorner = Instance.new("UICorner")
-RoundCorner.CornerRadius = UDim.new(1, 0) 
-RoundCorner.Parent = CloseOpenBtn
-
-local UIStroke = Instance.new("UIStroke")
-UIStroke.Color = Color3.fromRGB(255, 215, 0) 
-UIStroke.Thickness = 1.5
-UIStroke.Parent = CloseOpenBtn
-
--- Logic xử lý ẩn hiện bảng to khi bấm nút tròn "QH"
-CloseOpenBtn.MouseButton1Click:Connect(function()
-    MainFrame.Visible = not MainFrame.Visible
+-- Sự kiện biên dịch và thực thi mã script dán ngoài vào ô trống (Load Script)
+ExecuteBtn.MouseButton1Click:Connect(function()
+    local code = ScriptBox.Text
+    if code and code ~= "" then
+        local success, err = pcall(function()
+            local func = assert(loadstring(code))
+            func()
+        end)
+        if not success then
+            ExecuteBtn.Text = "LỖI CODE! KIỂM TRA LẠI"
+            ExecuteBtn.BackgroundColor3 = Color3.fromRGB(231, 76, 60)
+            task.wait(1.5)
+            ExecuteBtn.Text = "EXECUTE SCRIPT"
+            ExecuteBtn.BackgroundColor3 = Color3.fromRGB(52, 152, 219)
+        else
+            ExecuteBtn.Text = "KÍCH HOẠT THÀNH CÔNG!"
+            ExecuteBtn.BackgroundColor3 = Color3.fromRGB(46, 204, 113)
+            task.wait(1)
+            ExecuteBtn.Text = "EXECUTE SCRIPT"
+            ExecuteBtn.BackgroundColor3 = Color3.fromRGB(52, 152, 219)
+        end
+    end
 end)
+
 
 -- ===== CƠ CHẾ SILENT AIM SIÊU THÔNG MINH (ƯU TIÊN PVP 100%) =====
 local function GetClosestTarget()
     local MaxDistance = math.huge
     local Target = nil
     local PlayerFound = false
-    
-    -- BƯỚC 1: QUÉT TÌM NGƯỜI CHƠI XUNG QUANH TRƯỚC
+
+    -- Ưu tiên quét tìm đối thủ là người chơi thực trước
     for _, v in pairs(Players:GetPlayers()) do
         if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChildOfClass("Humanoid") and v.Character:FindFirstChildOfClass("Humanoid").Health > 0 then
             local Pos, OnScreen = workspace.CurrentCamera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
@@ -105,13 +212,13 @@ local function GetClosestTarget()
                 if Dist < MaxDistance then
                     MaxDistance = Dist
                     Target = v.Character.HumanoidRootPart
-                    PlayerFound = true -- Khóa mục tiêu là người chơi
+                    PlayerFound = true
                 end
             end
         end
     end
-    
-    -- BƯỚC 2: CHỈ QUÉT QUÁI/NPC NẾU HOÀN TOÀN KHÔNG CÓ NGƯỜI CHƠI NÀO Ở CẠNH
+
+    -- Chỉ quét mục tiêu là Quái/NPC khi xung quanh hoàn toàn không có người chơi khác
     if not PlayerFound then
         for _, v in pairs(workspace:GetChildren()) do
             if v:IsA("Model") and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChildOfClass("Humanoid") and v:FindFirstChildOfClass("Humanoid").Health > 0 then
